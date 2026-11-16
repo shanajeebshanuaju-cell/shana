@@ -54,14 +54,38 @@ toTop.onclick = () => scrollTo({ top: 0, behavior: 'smooth' });
 // Close mobile menu after choosing a link
 $$('#menu .nav-link').forEach(l => l.addEventListener('click', () => bootstrap.Collapse.getInstance($('#menu'))?.hide()));
 
-/* ===== CONTACT FORM: opens the visitor's email app with the message filled in ===== */
+/* ===== CONTACT FORM: sends message directly to WhatsApp ===== */
+const WHATSAPP_CONFIG = {
+  phoneNumber: '917594003335' // +91 7594 003 335
+};
+
 $('#contactForm').addEventListener('submit', e => {
   e.preventDefault();
   const [n, em, s, m] = ['fn', 'fe', 'fs', 'fm'].map(id => $('#' + id).value.trim());
   const note = $('#formNote');
-  if (!n || !/^\S+@\S+\.\S+$/.test(em) || !s || !m) { note.textContent = 'Please fill in every field with a valid email.'; return; }
-  note.textContent = 'Opening your email app…';
-  location.href = `mailto:shanajeebshanuaju@gmail.com?subject=${encodeURIComponent(s)}&body=${encodeURIComponent(m + '\n\n' + n + ' (' + em + ')')}`;
+
+  if (!n || !/^\S+@\S+\.\S+$/.test(em) || !s || !m) {
+    note.style.color = '#ff8a93';
+    note.textContent = 'Please fill in every field with a valid email.';
+    return;
+  }
+
+  const messageText =
+    `*New Portfolio Inquiry*\n\n` +
+    `*Name:* ${n}\n` +
+    `*Email:* ${em}\n` +
+    `*Subject:* ${s}\n\n` +
+    `*Message:*\n${m}`;
+
+  const whatsappUrl = `https://wa.me/${WHATSAPP_CONFIG.phoneNumber}?text=${encodeURIComponent(messageText)}`;
+
+  note.style.color = '#4ade80';
+  note.textContent = 'Opening WhatsApp…';
+
+  const opened = window.open(whatsappUrl, '_blank');
+  if (!opened || opened.closed || typeof opened.closed === 'undefined') {
+    window.location.href = whatsappUrl;
+  }
 });
 
 /* ===== LOADER ===== */
